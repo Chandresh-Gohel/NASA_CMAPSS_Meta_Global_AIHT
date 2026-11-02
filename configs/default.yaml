@@ -1,0 +1,141 @@
+# Engine Health Agent - default configuration.
+# The single source of truth for every tunable. Code reads values from here;
+# nothing numeric is hard-coded in the modules.
+
+project:
+  seed: 42
+  device: auto            # auto = CUDA when a GPU is present, else CPU
+
+paths:
+  raw_dir: CMAPSSData               # train_FD00x.txt, test_FD00x.txt, RUL_FD00x.txt at the repo root
+  artifacts_dir: artifacts            # prepared data, trained models, calibration, precomputed results
+  reports_dir: reports                # metrics.json + charts
+  cache_dir: .cache                   # cached Muse Spark responses (offline demo replays these)
+  prompts_dir: prompts
+
+data:
+  subsets: [FD001, FD002, FD003, FD004]
+  # The 14 sensors that actually vary (the other 7 are near-constant).
+  sensors: [s2, s3, s4, s7, s8, s9, s11, s12, s13, s14, s15, s17, s20, s21]
+  n_conditions: {FD001: 1, FD002: 6, FD003: 1, FD004: 6}
+  rul_cap: 125            # piecewise-linear target: early-life labels saturate here
+  window: 30              # cycles per input window
+  min_history: 15         # shortest history that still yields windows (edge-padded below 30)
+  split: {train: 0.60, val: 0.10, calib: 0.15, sim: 0.15}   # by engine ID, training file only
+
+model:
+  family: dkl             # dkl (primary) | ensemble (backup) | cnn (point baseline)
+  multitask_mode: lmc     # lmc = LMC variational GP | embedding = shared CNN + subset embedding + one GP
+  embed_dim: 16
+  channels: 64
+  n_blocks: 3
+  kernel_size: 5
+  dropout: 0.3
+  spectral_norm: true     # Lipschitz-bounded features stay distance-aware for the GP head
+  sn_coeff: 0.9
+  task_embed_dim: 4
+  inducing_points: 512
+  num_latents: 3          # LMC latent GPs shared across subsets
+  ensemble_size: 5
+
+train:
+  batch_size: 256
+  dkl_batch_size: 512
+  pretrain_epochs: 40
+  pretrain_lr: 5.0e-4
+  dkl_epochs: 30
+  dkl_lr_features: 1.0e-5 # small on purpose: the extractor must not drift under the GP
+  dkl_lr_gp: 1.0e-2
+  ensemble_epochs: 40
+  ensemble_warmup_epochs: 10
+  ensemble_lr: 1.0e-3
+  beta_nll: 0.5
+  weight_decay: 1.0e-2
+  grad_clip: 5.0
+  patience: 8
+  early_stop_metric: rmse   # rmse | nll
+  inducing_init_samples: 20000
+  num_workers: 0
+
+calibration:
+  alpha: 0.10               # 90% bands
+  alpha_conservative: 0.02  # 98% lower bound for deadlines and re-check intervals
+  bins: [0, 30, 60, 90, 1000]   # Mondrian bins on predicted RUL
+  cuts_per_engine: 30
+  min_group_size: 30
+  lower_tail_share: 0.25    # miss budget split: 2.5% below the band (unsafe side), 7.5% above
+
+decision:
+  horizon_cycles: 30        # H: cycles until the next maintenance opportunity
+  p_inspect: 0.50           # inspect when P(fail within H) reaches this
+  p_clear: 0.10             # clear when at or below this; between = abstain
+  epistemic_percentile_abstain: 99.0
+  urgent_cycles: 10
+  max_recheck_cycles: 20
+
+sensor_checks:
+  lookback: 15
+  stuck_min_cycles: 10
+  z_abs_max_margin: 1.5
+  jump_multiplier: 2.0      # flags a step above 2x the 99.9th training percentile
+  flat_rate_max: 0.01
+
+faults:
+  default_sensor: s11       # Ps30
+  default_start_offset: 20  # cycles before the latest cycle
+  magnitudes: {stuck: 0.0, drift: 3.0, spike: 12.0, noise: 3.0}   # training std (drift: per 10 cycles)
+
+simulation:
+  useful_inspection_rul: 30 # an inspection counts if true RUL is at most this
+  min_lead_cycles: 1
+  cooldown_cycles: 10
+  fixed_interval_cycles: 50
+  abstain_action: review    # inspect | review | review_oracle | skip
+
+planner:
+  cycles_per_day: 4
+  slots_per_day: 2
+  review_slots_per_day: 4
+  horizon_days: 7
+
+attribution:
+  ig_steps: 32
+  top_k: 5
+  deletion_top_k: 3
+  deletion_random_trials: 20
+
+evaluation:
+  ood_source: FD001
+  ood_target: FD004
+  ood_max_engines: 100
+  fault_test_engines: 30
+  attribution_test_engines: 30
+
+agent:
+  default_model: muse-spark-1.3
+  model_env: MUSE_MODEL
+  default_base_url: https://api.meta.ai/v1
+  base_url_env: MODEL_API_BASE_URL
+  api_key_env: MODEL_API_KEY
+  offline_env: EHA_OFFLINE
+  reasoning_effort: low     # minimal | low | medium | high | xhigh ; null to omit
+  temperature: 0.2          # null to omit
+  max_tool_rounds: 5
+  cache: true
+  timeout_s: 90
+  max_retries: 3
+
+features:          # demo switches (the app sidebar overrides them live)
+  multitask_model: true
+  agents: true
+  reviewer: true
+  planner_agent: true
+  fault_injection: true
+  show_answer_key: false
+  engine_upload: true
+
+upload:
+  max_mb: 30          # reject larger files before parsing (matches .streamlit/config.toml)
+  max_engines: 300    # engines per file (whole official files hold up to 260)
+  max_rows: 100000    # rows per file (largest official file is ~65k rows)
+  keep_last: 500      # uploaded engines kept in memory; oldest dropped first

@@ -1,0 +1,110 @@
+{
+ "model": "dkl_multitask",
+ "generated_at": "2026-11-02T17:26:36",
+ "heads_up": {
+  "ungated_cycles": 21809,
+  "inspect_equals_mean_below_horizon": 1.0,
+  "engines_with_inspect": 106,
+  "engines_flagged_before_inspect": 105,
+  "median_heads_up_cycles": 13.0,
+  "q25": 8.0,
+  "q75": 19.0
+ },
+ "replay_by_stage": [
+  {
+   "stage": "0-30",
+   "cycles": 3180,
+   "median_band_width": 12.998768066922604,
+   "coverage": 0.9066037735849056,
+   "share_abstain": 0.16949685534591194,
+   "share_inspect": 0.8147798742138365
+  },
+  {
+   "stage": "30-60",
+   "cycles": 3180,
+   "median_band_width": 39.736068724803516,
+   "coverage": 0.9034591194968553,
+   "share_abstain": 0.2808176100628931,
+   "share_inspect": 0.05157232704402516
+  },
+  {
+   "stage": "60-90",
+   "cycles": 3180,
+   "median_band_width": 66.19877789617792,
+   "coverage": 0.9072327044025157,
+   "share_abstain": 0.016981132075471698,
+   "share_inspect": 0.0
+  },
+  {
+   "stage": "90-125",
+   "cycles": 3710,
+   "median_band_width": 58.39679345882461,
+   "coverage": 0.9043126684636119,
+   "share_abstain": 0.006738544474393531,
+   "share_inspect": 0.0
+  },
+  {
+   "stage": "above 125",
+   "cycles": 8956,
+   "median_band_width": 58.3598132673101,
+   "coverage": 0.8881196962929879,
+   "share_abstain": 0.0160786065207682,
+   "share_inspect": 0.002121482804823582
+  }
+ ],
+ "test_by_stage": [
+  {
+   "stage": "0-30",
+   "engines": 157,
+   "rmse": 5.312070139971283,
+   "mean_error": 2.5859872611464967,
+   "share_of_squared_error": 0.02928452139091958
+  },
+  {
+   "stage": "30-60",
+   "engines": 115,
+   "rmse": 14.340547560948503,
+   "mean_error": 6.593043478260869,
+   "share_of_squared_error": 0.15632922876483188
+  },
+  {
+   "stage": "60-90",
+   "engines": 122,
+   "rmse": 22.727391937094215,
+   "mean_error": 11.594262295081966,
+   "share_of_squared_error": 0.41655265821956455
+  },
+  {
+   "stage": "90-125",
+   "engines": 163,
+   "rmse": 14.76410628368098,
+   "mean_error": 0.26564417177914107,
+   "share_of_squared_error": 0.234862028130787
+  },
+  {
+   "stage": "above 125",
+   "engines": 150,
+   "rmse": 12.820496610246161,
+   "mean_error": -8.999333333333334,
+   "share_of_squared_error": 0.162971563493897
+  }
+ ],
+ "test_rmse_capped_by_subset": {
+  "FD001": 13.982714328770362,
+  "FD002": 14.24441094756969,
+  "FD003": 14.018241687173184,
+  "FD004": 15.492970570448206
+ },
+ "prediction_leaves_cap": {
+  "median": 91.0,
+  "q25": 76.5,
+  "q75": 105.75,
+  "engines": 106,
+  "median_by_subset": {
+   "FD001": 102.0,
+   "FD002": 87.0,
+   "FD003": 84.0,
+   "FD004": 94.0
+  }
+ }
+}
