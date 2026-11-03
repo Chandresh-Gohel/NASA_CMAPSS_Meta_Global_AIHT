@@ -180,11 +180,11 @@ def contributions_chart(contribs: list[dict], mode: str) -> go.Figure:
         customdata=[c["description"] for c in rows], hovertemplate="%{y}: %{x:+.1f} cycles<br>%{customdata}<extra></extra>",
     ))
     base_layout(fig, mode, 70 + 34 * len(rows))
-    fig.update_layout(margin=dict(l=10, r=48, t=10, b=40), showlegend=False)
+    fig.update_layout(margin=dict(l=120, r=48, t=10, b=40), showlegend=False)
     fig.update_xaxes(title_text="Contribution to the RUL estimate vs a healthy engine (cycles)", gridcolor=ink["grid"],
                      zeroline=True, zerolinecolor=ink["axis"],
                      range=[lo_v - (pad if lo_v < 0 else 0.0), hi_v + (pad if hi_v > 0 else 0.0)])
-    fig.update_yaxes(showgrid=False)
+    fig.update_yaxes(showgrid=False, automargin=True)
     return fig
 
 
