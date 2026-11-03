@@ -1,0 +1,1 @@
+{"role": "assistant", "content": "Evidence gathering for FD001-TE-020 \u2014 pulling the drivers behind the inspect call.", "tool_calls": [{"id": "call_c15cfe73-205b-4ef1-b798-a22911e06776", "type": "function", "function": {"name": "explain_prediction", "arguments": "{\"engine_id\":\"FD001-TE-020\",\"top_k\":3}"}}], "finish_reason": "tool_calls"}

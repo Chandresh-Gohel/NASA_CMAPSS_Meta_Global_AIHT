@@ -124,8 +124,8 @@ Spec section map:
 - **If an exit check fails twice,** stop, report what you saw, and propose the fallback listed for
   that step. Don't keep retrying.
 - **Keep changes small and local.** Don't refactor modules outside the current step.
-- **Data** lives in `data/raw/CMAPSSData/` (`train_FD00x.txt`, `test_FD00x.txt`, `RUL_FD00x.txt`;
-  26 space-separated columns). The user downloads it. If it's missing, stop and ask.
+- **Data** lives in `CMAPSSData/` at the repo root (`paths.raw_dir`): `train_FD00x.txt`, `test_FD00x.txt`,
+  `RUL_FD00x.txt`, 26 space-separated columns. The 12 files are committed. If they're missing, stop and ask.
 - **Ask the user before:**
   - deleting files;
   - changing thresholds or decision rules;
@@ -257,7 +257,8 @@ Section 8 of the spec has the urgency, recheck intervals and the resolution word
   progress.
 - Seeds and paths come from the config.
 - Where things go: `artifacts/` (prepared data, models, calibration, precomputed results),
-  `reports/`, `.cache/`, `logs/`. Don't commit those, `data/raw/` or `.env`.
+  `reports/`, `.cache/`, `logs/`. `.gitignore` lets through only what the app needs (section 12);
+  never commit `.env` or `logs/`.
 - Exit checks live in `scripts/check_<step>.py`. They run in under two minutes on CPU and need no
   API key.
 - Charts:
@@ -298,3 +299,8 @@ Judges need to see Muse Spark doing real work:
 - **Replay:** ABSTAIN counts as an engineer review (simulation.abstain_action: review). Reviews are
   counted separately and never credited as a catch.
 - **Default model:** multitask (features.multitask_model: true).
+- **Deploy:** the files the app needs are committed, so a clone and the hosted app run without training.
+  `.gitignore` lets exactly these through: `artifacts/data/FD00?.pkl`, the DKL models, the two calibration files
+  (not `*.bak.json`), `artifacts/precomputed/dkl_*.pkl`, the 12 `CMAPSSData/*.txt` files and `.cache/llm/*.json`.
+  `reports/metrics.json` and the charts are committed too. Re-run `python -m ehagent.precompute --mode both` and
+  commit again whenever a model, the calibration or the config changes.

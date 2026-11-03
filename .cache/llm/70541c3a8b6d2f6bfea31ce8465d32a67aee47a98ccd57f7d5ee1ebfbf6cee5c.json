@@ -1,0 +1,1 @@
+{"role": "assistant", "content": "Gathering evidence to support the inspection decision.", "tool_calls": [{"id": "call_a33e4bcd-1ed7-412e-a5a0-449ff3510151", "type": "function", "function": {"name": "explain_prediction", "arguments": "{\"engine_id\":\"FD001-TE-020\",\"top_k\":3}"}}], "finish_reason": "tool_calls"}

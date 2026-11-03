@@ -115,9 +115,8 @@ flowchart LR
 
 ## Results
 
-Model `dkl_multitask` (multitask deep kernel learning, 30-cycle window). Every number below is printed from
-`reports/metrics.json` and `reports/rul_stage_report_dkl_multitask.json` by the two scripts named in "Run it";
-nothing is typed by hand.
+Model `dkl_multitask` (multitask deep kernel learning, 30-cycle window). Every table below is printed from
+`reports/metrics.json` and `reports/rul_stage_report_dkl_multitask.json` by the two scripts named in "Run it".
 
 ### Accuracy and calibration
 
@@ -136,9 +135,11 @@ Scored at the last cycle of each official test engine, with true RUL capped at 1
   with far more than 125 cycles left. The model reports those as "healthy, at least 125" rather than guessing.
 - **Multitask vs single-task:** the multitask model is more accurate than single-task models on all four subsets, by
   0.6–1.3 cycles.
-- **Against published models:** the best published point predictor we checked, STAR (2024), reports 10.61, 13.47,
-  10.71 and 15.87. We're behind on three subsets and ahead on FD004. STAR gives one number per engine, with no band
-  and no way to abstain. Protocols differ between papers.
+- **Against published models:** STAR (2024), a strong published point predictor, reports 10.61, 13.47, 10.71 and
+  15.87. We're behind on three subsets and ahead on FD004. STAR gives one number per engine, with no band and no way
+  to abstain. A few 2024–2025 papers report lower RMSE on some subsets (for example 11.58 on FD002 and 12.38 on
+  FD004, arXiv:2507.09766), mostly without stating where each test engine is scored or the RUL cap, so protocols
+  differ between papers.
 
 ### Maintenance policies
 
@@ -239,26 +240,25 @@ Official test engines, last cycle (mean error above 0 means the model predicted 
 ### Requirements
 
 - **Python:** 3.10 or newer (tested with 3.10 and 3.13).
-- **NASA C-MAPSS data:** download `CMAPSSData.zip` from
-  [CMAPSS Jet Engine Simulated Data](https://data.nasa.gov/dataset/cmapss-jet-engine-simulated-data). Unzip it so
-  that `CMAPSSData/train_FD001.txt` and the other files sit at the repo root.
+- **NASA C-MAPSS data:** the 12 text files are in `CMAPSSData/`, from
+  [CMAPSS Jet Engine Simulated Data](https://data.nasa.gov/dataset/cmapss-jet-engine-simulated-data) on NASA's Open
+  Data Portal.
 - **Hardware:** a CUDA GPU is recommended for training. Calibration, evaluation and the app run on CPU
   (`project.device: auto`).
 - **Optional:** a Meta Model API key, for live Muse Spark.
 
 ```bash
-git clone <repo-url>
-cd <repo-folder>
-pip install -r requirements.txt
-# CPU-only machine: install PyTorch first with
-#   pip install torch --index-url https://download.pytorch.org/whl/cpu
+git clone https://github.com/Chandresh-Gohel/NASA_CMAPSS_Meta_Global_AIHT.git
+cd NASA_CMAPSS_Meta_Global_AIHT
+pip install -r requirements.txt   # PyTorch's CPU build: enough for the app and the evaluation
+# GPU training (Option B): install the CUDA build of PyTorch from pytorch.org first
 cp .env.example .env        # Windows: copy .env.example .env ; then add MODEL_API_KEY (optional)
 ```
 
 ### Option A: use the trained artifacts
 
-Download `artifacts.zip` and `reports.zip` from the release (RELEASE_URL), unzip both at the repo root, then
-start the app:
+The repo includes what the app needs: the trained models, calibration, prepared data and precomputed results in
+`artifacts/`, the evaluation report in `reports/`, and cached Muse Spark responses in `.cache/llm/`. Start the app:
 
 ```bash
 streamlit run app/streamlit_app.py
@@ -335,10 +335,12 @@ configs/default.yaml    every tunable
 scripts/                exit checks, results tables, policy sweep, stage report, diagnostics
 docs/SPEC.md            the full design spec (AGENTS.md section 3 lists what to ignore)
 .streamlit/config.toml  upload size cap (matches configs/default.yaml)
-AGENTS.md, .agents/     project instructions and build log for Muse Code
+AGENTS.md               project instructions for Muse Code
 log/workdone.md         continuous build log across sessions
-artifacts/, reports/    generated (not in git)
-CMAPSSData/             NASA data (download; not in git)
+artifacts/              trained models, calibration, prepared data, precomputed results (Option B rebuilds them)
+reports/                metrics.json and the charts from the evaluation run
+.cache/llm/             cached Muse Spark responses (replayed with EHA_OFFLINE=1)
+CMAPSSData/             the NASA C-MAPSS text files
 ```
 
 ## What's next

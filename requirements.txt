@@ -1,3 +1,6 @@
+# PyTorch's CPU build: the hosted app has no GPU, and it is a fraction of the CUDA build's size.
+# For GPU training, install the CUDA build from pytorch.org before this file.
+--extra-index-url https://download.pytorch.org/whl/cpu
 numpy>=1.24
 pandas>=2.0
 scipy>=1.10

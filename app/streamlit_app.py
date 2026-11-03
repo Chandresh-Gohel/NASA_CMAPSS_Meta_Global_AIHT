@@ -10,6 +10,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import os
 import sys
 from pathlib import Path
 
@@ -30,6 +31,22 @@ from ehagent.viz import ACTION_ICONS, CATEGORICAL, CHROME, DIVERGING, action_col
 
 load_dotenv_if_present()
 st.set_page_config(page_title="Engine Health Agent", page_icon="🛠️", layout="wide")
+
+
+def secrets_to_env() -> None:
+    """Hosted runs keep settings in Streamlit secrets; the agent client reads environment variables.
+
+    Local runs have no secrets file and use .env instead. An environment variable that is already set wins."""
+    try:
+        secrets = dict(st.secrets)
+    except Exception:
+        return
+    for name in ("MODEL_API_KEY", "META_API_KEY", "MUSE_MODEL", "MODEL_API_BASE_URL", "EHA_OFFLINE"):
+        if name in secrets and not os.environ.get(name):
+            os.environ[name] = str(secrets[name])
+
+
+secrets_to_env()
 CFG = load_config()
 
 
@@ -246,7 +263,7 @@ try:
     service = get_service(multitask)
 except (FileNotFoundError, ValueError) as exc:
     st.error(f"Missing artifacts for this model: {exc}")
-    st.info("Run the pipeline first (README, 'Run order'): prepare -> baseline -> dkl -> calibrate -> precompute.")
+    st.info("Run the pipeline first (README, 'Run it'): prepare -> baseline -> dkl -> calibrate -> precompute.")
     st.stop()
 orch = get_orchestrator(multitask)
 subset_choice = st.sidebar.selectbox("Fleet subset", ["ALL"] + service.subsets)
