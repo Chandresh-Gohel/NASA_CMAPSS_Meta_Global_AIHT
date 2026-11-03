@@ -6,7 +6,7 @@ abstain, and Muse Spark agents that explain every call.
 > **Decision support on NASA's simulated C-MAPSS benchmark.** Not an airworthiness determination: a licensed engineer
 > makes the final decision.
 
-**Live app:** LIVE_APP_URL · **Demo video (3 min):** VIDEO_URL
+**Live app:** [LIVE_APP_URL](https://cgcmapsssimgp.streamlit.app/) · **Demo video (3 min):** VIDEO_URL
 
 ## What it does
 
